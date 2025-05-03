@@ -62,10 +62,9 @@
         }
         #preview {
             position: relative;
-            width: 400px;
-            height: 400px;
+            width: 800px;
+            height: 600px;
             margin: 0 auto;
-            border-radius: 50%;
             overflow: hidden;
             display: none;
         }
@@ -78,8 +77,9 @@
         }
         #photoLayer {
             z-index: 10;
-            background-size: cover;
-            background-position: center;
+            background-size: 200px 200px;
+            background-position: top right;
+            background-repeat: no-repeat;
         }
         #backgroundLayer {
             z-index: 5;
@@ -206,8 +206,6 @@
         // Generate badge
         generateBtn.addEventListener('click', () => {
             photoLayer.style.backgroundImage = `url(${uploadedPhoto.src})`;
-            photoLayer.style.backgroundSize = 'cover';
-            photoLayer.style.backgroundPosition = 'center';
             preview.style.display = 'block';
             downloadBtn.style.display = 'block';
             socialSharing.style.display = 'block';
@@ -216,21 +214,28 @@
         // Download badge
         downloadBtn.addEventListener('click', () => {
             const canvas = document.createElement('canvas');
-            canvas.width = 400;
-            canvas.height = 400;
+            canvas.width = 800;
+            canvas.height = 600;
             const ctx = canvas.getContext('2d');
             
             // Draw background
             const backgroundImg = new Image();
             backgroundImg.src = backgroundImageUrl;
             backgroundImg.onload = () => {
-                ctx.drawImage(backgroundImg, 0, 0, 400, 400);
+                ctx.drawImage(backgroundImg, 0, 0, 800, 600);
                 
                 // Draw uploaded photo
                 const photoImg = new Image();
                 photoImg.src = uploadedPhoto.src;
                 photoImg.onload = () => {
-                    ctx.drawImage(photoImg, 0, 0, 400, 400);
+                    // Calculate position with 10% margin from top and right
+                    const topMargin = 0.4 * 600; // 10% of height
+                    const rightMargin = 0.4 * 800; // 10% of width
+                    const photoX = 800 - 200 - rightMargin; // Right edge - photo width - margin
+                    const photoY = topMargin; // Top margin
+
+                    // Draw photo with calculated margins
+                    ctx.drawImage(photoImg, photoX, photoY, 200, 200);
                     
                     // Create download link
                     const link = document.createElement('a');
