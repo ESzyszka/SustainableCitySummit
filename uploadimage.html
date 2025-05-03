@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Badge Generator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #2c5282;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .instructions {
+            margin-bottom: 25px;
+        }
+        .upload-section {
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        #uploadBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #uploadBtn:hover {
+            background-color: #45a049;
+        }
+        #generateBtn {
+            background-color: #2c5282;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+        }
+        #generateBtn:hover {
+            background-color: #1a365d;
+        }
+        #preview {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            border-radius: 50%;
+            overflow: hidden;
+            display: none;
+        }
+        .badge-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        #photoLayer {
+            z-index: 10;
+            background-size: cover;
+            background-position: center;
+        }
+        #backgroundLayer {
+            z-index: 5;
+        }
+        #foregroundLayer {
+            z-index: 15;
+        }
+        #downloadBtn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: none;
+            margin: 20px auto;
+        }
+        #downloadBtn:hover {
+            background-color: #0056b3;
+        }
+        .social-sharing {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        .social-btn {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .linkedin {
+            background-color: #0077b5;
+        }
+        .twitter {
+            background-color: #1DA1F2;
+        }
+        .facebook {
+            background-color: #4267B2;
+        }
+        #uploadedPhoto {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generate Your Event Badge</h1>
+        
+        <div class="instructions">
+            <h3>Create your personalized event badge in 3 easy steps:</h3>
+            <ol>
+                <li>Upload your photo</li>
+                <li>Generate your badge with your photo placed perfectly</li>
+                <li>Download and share on your social media</li>
+            </ol>
+        </div>
+        
+        <div class="upload-section">
+            <p>Select a photo to create your badge</p>
+            <input type="file" id="photoInput" accept="image/*" style="display: none;">
+            <button id="uploadBtn">Upload Your Photo</button>
+            <p id="photoStatus"></p>
+        </div>
+        
+        <button id="generateBtn" disabled>Generate Badge</button>
+        
+        <div id="preview">
+            <div id="backgroundLayer" class="badge-layer"></div>
+            <div id="photoLayer" class="badge-layer"></div>
+            <div id="foregroundLayer" class="badge-layer"></div>
+        </div>
+        
+        <button id="downloadBtn">Download Badge</button>
+        
+        <div class="social-sharing" id="socialSharing">
+            <h3>Share directly to your social media:</h3>
+            <a href="#" class="social-btn linkedin" id="linkedinShare">LinkedIn</a>
+            <a href="#" class="social-btn twitter" id="twitterShare">Twitter</a>
+            <a href="#" class="social-btn facebook" id="facebookShare">Facebook</a>
+        </div>
+        
+        <img id="uploadedPhoto" alt="Uploaded photo">
+    </div>
+    
+    <script>
+        // Background and foreground image URLs would be stored on your server
+        const backgroundImageUrl = 'https://your-domain.com/badge-background.jpg';
+        const foregroundImageUrl = 'https://your-domain.com/badge-foreground.png';
+        
+        const photoInput = document.getElementById('photoInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const preview = document.getElementById('preview');
+        const photoStatus = document.getElementById('photoStatus');
+        const uploadedPhoto = document.getElementById('uploadedPhoto');
+        const photoLayer = document.getElementById('photoLayer');
+        const backgroundLayer = document.getElementById('backgroundLayer');
+        const foregroundLayer = document.getElementById('foregroundLayer');
+        const socialSharing = document.getElementById('socialSharing');
+        
+        // Set background and foreground images
+        backgroundLayer.style.backgroundImage = `url(${backgroundImageUrl})`;
+        foregroundLayer.style.backgroundImage = `url(${foregroundImageUrl})`;
+        
+        // Handle upload button click
+        uploadBtn.addEventListener('click', () => {
+            photoInput.click();
+        });
+        
+        // Handle photo selection
+        photoInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedPhoto.src = e.target.result;
+                    photoStatus.textContent = "Photo uploaded successfully!";
+                    generateBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Generate badge
+        generateBtn.addEventListener('click', () => {
+            photoLayer.style.backgroundImage = `url(${uploadedPhoto.src})`;
+            preview.style.display = 'block';
+            downloadBtn.style.display = 'block';
+            socialSharing.style.display = 'block';
+        });
+        
+        // Download badge (simplified - in a real app you'd use canvas to create the actual download)
+        downloadBtn.addEventListener('click', () => {
+            // This is a simplified version. In a real implementation,
+            // you would use html2canvas or another library to generate
+            // an actual downloadable image from the preview div
+            alert("In a complete implementation, this would download your badge image!");
+            
+            // Example code for generating downloadable image (not functional in this example):
+            /*
+            html2canvas(document.getElementById('preview')).then(canvas => {
+                const image = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.href = image;
+                link.download = 'my-event-badge.png';
+                link.click();
+            });
+            */
+        });
+        
+        // Social sharing setup (simplified)
+        document.getElementById('linkedinShare').addEventListener('click', (e) => {
+            e.preventDefault();
+            // In reality, you would upload the generated image to your server first,
+            // then share the URL to that image
+            const shareUrl = encodeURIComponent('https://your-domain.com/shared-badge');
+            const shareTitle = encodeURIComponent('Check out my event badge!');
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`);
+        });
+        
+        // Similar handlers for Twitter and Facebook sharing would be implemented
+    </script>
+</body>
+</html>
