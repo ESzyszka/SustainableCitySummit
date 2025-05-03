@@ -84,9 +84,6 @@
         #backgroundLayer {
             z-index: 5;
         }
-        #foregroundLayer {
-            z-index: 15;
-        }
         #downloadBtn {
             background-color: #007bff;
             color: white;
@@ -154,7 +151,6 @@
         <div id="preview">
             <div id="backgroundLayer" class="badge-layer"></div>
             <div id="photoLayer" class="badge-layer"></div>
-            <div id="foregroundLayer" class="badge-layer"></div>
         </div>
         
         <button id="downloadBtn">Download Badge</button>
@@ -170,9 +166,7 @@
     </div>
     
     <script>
-        // Background and foreground image URLs would be stored on your server
-        const backgroundImageUrl = 'https://your-domain.com/badge-background.jpg';
-        const foregroundImageUrl = 'https://your-domain.com/badge-foreground.png';
+        const backgroundImageUrl = '/Users/ewa.szyszka/Desktop/SustainableCitySummit/background.png';
         
         const photoInput = document.getElementById('photoInput');
         const uploadBtn = document.getElementById('uploadBtn');
@@ -183,12 +177,12 @@
         const uploadedPhoto = document.getElementById('uploadedPhoto');
         const photoLayer = document.getElementById('photoLayer');
         const backgroundLayer = document.getElementById('backgroundLayer');
-        const foregroundLayer = document.getElementById('foregroundLayer');
         const socialSharing = document.getElementById('socialSharing');
         
-        // Set background and foreground images
+        // Set background image
         backgroundLayer.style.backgroundImage = `url(${backgroundImageUrl})`;
-        foregroundLayer.style.backgroundImage = `url(${foregroundImageUrl})`;
+        backgroundLayer.style.backgroundSize = 'cover';
+        backgroundLayer.style.backgroundPosition = 'center';
         
         // Handle upload button click
         uploadBtn.addEventListener('click', () => {
@@ -212,41 +206,48 @@
         // Generate badge
         generateBtn.addEventListener('click', () => {
             photoLayer.style.backgroundImage = `url(${uploadedPhoto.src})`;
+            photoLayer.style.backgroundSize = 'cover';
+            photoLayer.style.backgroundPosition = 'center';
             preview.style.display = 'block';
             downloadBtn.style.display = 'block';
             socialSharing.style.display = 'block';
         });
         
-        // Download badge (simplified - in a real app you'd use canvas to create the actual download)
+        // Download badge
         downloadBtn.addEventListener('click', () => {
-            // This is a simplified version. In a real implementation,
-            // you would use html2canvas or another library to generate
-            // an actual downloadable image from the preview div
-            alert("In a complete implementation, this would download your badge image!");
+            const canvas = document.createElement('canvas');
+            canvas.width = 400;
+            canvas.height = 400;
+            const ctx = canvas.getContext('2d');
             
-            // Example code for generating downloadable image (not functional in this example):
-            /*
-            html2canvas(document.getElementById('preview')).then(canvas => {
-                const image = canvas.toDataURL("image/png");
-                const link = document.createElement('a');
-                link.href = image;
-                link.download = 'my-event-badge.png';
-                link.click();
-            });
-            */
+            // Draw background
+            const backgroundImg = new Image();
+            backgroundImg.src = backgroundImageUrl;
+            backgroundImg.onload = () => {
+                ctx.drawImage(backgroundImg, 0, 0, 400, 400);
+                
+                // Draw uploaded photo
+                const photoImg = new Image();
+                photoImg.src = uploadedPhoto.src;
+                photoImg.onload = () => {
+                    ctx.drawImage(photoImg, 0, 0, 400, 400);
+                    
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = 'event-badge.png';
+                    link.click();
+                };
+            };
         });
         
-        // Social sharing setup (simplified)
+        // Social sharing setup
         document.getElementById('linkedinShare').addEventListener('click', (e) => {
             e.preventDefault();
-            // In reality, you would upload the generated image to your server first,
-            // then share the URL to that image
-            const shareUrl = encodeURIComponent('https://your-domain.com/shared-badge');
+            const shareUrl = encodeURIComponent(window.location.href);
             const shareTitle = encodeURIComponent('Check out my event badge!');
             window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`);
         });
-        
-        // Similar handlers for Twitter and Facebook sharing would be implemented
     </script>
 </body>
 </html>
